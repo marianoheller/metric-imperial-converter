@@ -33,6 +33,7 @@ const mwParser = function ( req, res, next) {
         if ( splitted.length === 0 ) splitted[0] = '1';
         const parsedInput = splitted[0].split('/').reduce( (acc, d, i) => {
             if ( i === 0) acc = parseFloat(d);
+            else acc = acc/parseFloat(d);
             return acc;
         }, 0 );
         if ( !isNumeric(parsedInput) ) res.send("invalid unit");
@@ -50,10 +51,6 @@ const mwParser = function ( req, res, next) {
 const mwConverter = function( req, res, next) {
 	if (!req.query.input) return res.sendStatus(400);
 
-	
-	req.output = {
-		...req.conversion,
-	};
 	next();
 }
 

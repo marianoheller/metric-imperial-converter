@@ -17,7 +17,7 @@ app.get('/', function (req, res) {
 
 app.get('/convert', mwParser, mwConverter,  function( req, res) {
 	if( !req.output ) res.status(500).send("Ocurrio un error al intentar convertir");
-	res.json(req.output)
+	res.json(req.conversion)
 })
 
 

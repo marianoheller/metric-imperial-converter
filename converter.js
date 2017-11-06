@@ -2,14 +2,17 @@
 const conversions = [
     {
         units: [ 'gal', 'L'],
+        names: [ 'gallons', 'liters'],
         relation: 3.78541,
     },
     {
         units: [ 'lbs', 'kg'],
+        names: [ 'pounds', 'kilograms'],
         relation: 0.453592,
     },
     {
         units: [ 'mi', 'km'],
+        names: [ 'miles', 'kilometers'],
         relation: 1.60934,
     }
 ];
@@ -67,7 +70,12 @@ const mwConverter = function( req, res, next) {
     })();
     req.conversion.returnNum = returnNum;
     req.conversion.returnUnit = conversionConfig.units[returnUnitIndex];
-    req.conversion.string = ""
+    req.conversion.string = `\
+    ${req.conversion.initNum} \
+    ${conversionConfig.names[(returnUnitIndex+1)%2]} \
+    converts to \
+    ${returnNum} \
+    ${conversionConfig.names[returnUnitIndex]}`
 	next();
 }
 

@@ -25,17 +25,15 @@ const mwParser = function ( req, res, next) {
 
     const units = conversions.reduce( (units, e) => units = [ ...units, ...e.units], [] );
     if ( !conversions.some( (conversion) => input.includes(conversion.units[0]) || input.includes(conversion.units[1])) ) {
-        console.log('Unit not found');
-        return res.status(200).send("invalid unit");
+        return res.send("invalid unit");
     }
     
     const conversion = conversions.find( (conversion) => input.includes(conversion.units[0]) || input.includes(conversion.units[1]));
     const indexUnitInput = conversion.units.findIndex( (unit) => input.includes(unit) );
-    const splitted = input.split(conversion[indexUnitInput]).filter( (substr) => substr );
+    const splitted = input.split(conversion.units[indexUnitInput]).filter( (substr) => substr );
     // falta checkear que no haya numero y rellenarlo con 1
     if ( splitted.length > 1 ) {
-        console.log('Numbers after unit. Invalid unit.');
-        return res.status(200).send("invalid unit");
+        return res.send("invalid unit");
     }
 
     if ( splitted.length === 0 ) splitted[0] = '1';
@@ -45,7 +43,6 @@ const mwParser = function ( req, res, next) {
         return acc;
     }, 0 );
     if ( !isNumeric(parsedInput) ) {
-        console.log('Non numeric input');
         return res.send("invalid unit");
     }
     req.conversion = {
@@ -90,5 +87,6 @@ function isNumeric(n) {
 
 module.exports = {
     mwParser: mwParser,
-    mwConverter: mwConverter
+    mwConverter: mwConverter,
+    conversions: conversions
 }

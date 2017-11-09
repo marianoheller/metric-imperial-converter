@@ -131,7 +131,30 @@ describe('converter testing', () => {
     })
 
     it('should convert correctly', () => {
-        req.query = {};
-        
+        const inputs = [
+            { initNum: 1, initUnit: 'kg' },
+            { initNum: 1, initUnit: 'km' },
+            { initNum: 1, initUnit: 'L' },
+            { initNum: 1, initUnit: 'lbs' },
+            { initNum: 1, initUnit: 'mi' },
+            { initNum: 1, initUnit: 'gal' },
+        ];
+        //doesnt check string, check return vals
+        const outputs = [
+            { returnNum: 2.20462, returnUnit: 'lbs' },
+            { returnNum: 0.62137, returnUnit: 'mi' },
+            { returnNum: 0.26417, returnUnit: 'gal' },
+            { returnNum: 0.45359, returnUnit: 'kg' },
+            { returnNum: 1.60934, returnUnit: 'km' },
+            { returnNum: 3.78541, returnUnit: 'L' },
+        ]
+        inputs.forEach( (input, index) => {
+            req.conversion = input;
+            mwConverter(req, res, next);
+            expect(next).to.be.called;
+            expect(req.conversion.returnNum).to.equal(outputs[index].returnNum);
+            expect(req.conversion.returnUnit).to.equal(outputs[index].returnUnit);
+            expect(req.conversion.string).to.exist;
+        })
     });
 })

@@ -21,32 +21,42 @@ const conversions = [
 
 const mwParser = function ( req, res, next) {
 	if (!req.query.input) return res.sendStatus(400);
-	const { input } = req.query;
+    const { input } = req.query;
+    const errors = {
+        invalidUnit: false,
+        invalidNumber: false,
+    }
 
     const units = conversions.reduce( (units, e) => units = [ ...units, ...e.units], [] );
-    if ( !conversions.some( (conversion) => input.includes(conversion.units[0]) || input.includes(conversion.units[1])) ) {
-        return res.send("invalid unit");
-    }
     
     const conversion = conversions.find( (conversion) => input.includes(conversion.units[0]) || input.includes(conversion.units[1]));
-    const indexUnitInput = conversion.units.findIndex( (unit) => input.includes(unit) );
-    const splitted = input.split(conversion.units[indexUnitInput]).filter( (substr) => substr );
-    // falta checkear que no haya numero y rellenarlo con 1
-    if ( splitted.length > 1 ) {
-        return res.send("invalid unit");
-    }
+    if ( !conversion ) errors.invalidUnit = true;
+    else {
+        var indexUnitInput = conversion.units.findIndex( (unit) => input.includes(unit) );
 
-    if ( splitted.length === 0 ) splitted[0] = '1';
-    const parsedInput = splitted[0].split('/').reduce( (acc, d, i) => {
-        if ( i === 0) acc = parseFloat(d);
-        else acc = acc/parseFloat(d);
-        return acc;
-    }, 0 );
-    if ( !isNumeric(parsedInput) ) {
-        return res.send("invalid unit");
+        let numberString = input.substring(0, input.indexOf(conversion.units[indexUnitInput]));
+        let postUnitString = input.substring(input.indexOf(conversion.units[indexUnitInput]) + conversion.units[indexUnitInput].length );
+
+        if ( numberString.length === 0 ) numberString = '1';
+        if ( postUnitString.length ) errors.invalidUnit = true;        
+
+        var output = numberString.split('/').reduce( (acc, d, i) => {
+            if ( i === 0) acc = Number(d);
+            else {
+                if ( !isNumeric(acc) ) acc;
+                else acc = acc/Number(d);
+            }
+            return acc;
+        }, 0 );
+        if ( !isNumeric(output) ) errors.invalidNumber = true;
     }
+    
+    if( errors.invalidNumber && errors.invalidUnit ) return res.send('invalid number and unit');
+    if( errors.invalidNumber ) return res.send('invalid number');
+    if( errors.invalidUnit ) return res.send('invalid unit');
+
     req.conversion = {
-        initNum: parseFloat(parsedInput.toFixed(5)), 
+        initNum: Number(output.toFixed(5)), 
         initUnit: conversion.units[indexUnitInput],
     }
     next();

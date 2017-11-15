@@ -8,17 +8,32 @@
 
 var chai = require('chai');
 var assert = chai.assert;
-var ConvertHandler = require('../controllers/convertHandler.js');
+const spies = require('chai-spies-next');
+const { mwParser, mwConverter, conversions } = require('./converter');
 
-var convertHandler = new ConvertHandler();
+chai.use(spies);
+
 
 suite('Unit Tests', function(){
   
   suite('Function convertHandler.getNum(input)', function() {
     
     test('Whole number input', function(done) {
-      var input = '32L';
-      assert.equal(convertHandler.getNum(input),32);
+      let res = {};
+      let req = {};
+      let next = chai.spy( () => {} );
+      res.send = chai.spy( () =>  {});
+      req.query.input =  '32L';
+      req.conversion = undefined;
+      res.send = chai.spy( () => {});
+      mwParser(req, res, next);
+      mwConverter(req, res, next);
+      expect(next).to.have.been.called();
+      expect(res.send).to.not.have.been.called();
+      expect(req.conversion).to.exist;
+      expect(req.conversion.initNum).to.equal(32);
+      expect(req.conversion.initUnit).to.be.a('string');
+
       done();
     });
     

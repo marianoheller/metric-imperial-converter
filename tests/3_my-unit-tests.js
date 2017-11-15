@@ -1,4 +1,4 @@
-const { mwParser, mwConverter, conversions } = require('./converter');
+const { mwParser, mwConverter, conversions } = require('../middleware/converter');
 const chai = require('chai');
 const spies = require('chai-spies-next');
 

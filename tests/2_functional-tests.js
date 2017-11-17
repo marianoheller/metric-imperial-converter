@@ -35,22 +35,22 @@ suite('Functional Tests', function() {
       
       test('Convert 32g (invalid input unit)', function(done) {
         
-        //done();
+        done();
       });
       
       test('Convert 3/7.2/4kg (invalid number)', function(done) {
         
-        //done();
+        done();
       });  
       
       test('Convert 3/7.2/4kilomegagram (invalid number and unit)', function(done) {
         
-        //done();
+        done();
       });
       
       test('Convert kg (no number)', function(done) {
         
-        //done();
+        done();
       });
       
     });

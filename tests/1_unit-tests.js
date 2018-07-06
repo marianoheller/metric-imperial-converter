@@ -7,9 +7,11 @@
 */
 
 var chai = require('chai');
+var assert = chai.assert;
 var expect = chai.expect;
 const spies = require('chai-spies-next');
-const { mwParser, mwConverter, conversions } = require('../middleware/converter');
+//const { mwParser, mwConverter, conversions } = require('../middleware/converter');
+const convertHandler = require('../modules/convertHandler');
 
 chai.use(spies);
 
@@ -18,63 +20,82 @@ suite('Unit Tests', function(){
   
   suite('Function convertHandler.getNum(input)', function() {
     
-    /*
     test('Whole number input', function(done) {
-      const res = {};
-      const req = {};
-      const next = chai.spy( () => {} );
-      res.send = chai.spy( () =>  {});
-      res.query = { input: '32L' };
-      
-      mwParser(req, res, next);
-      expect(next).to.have.been.called();
-      expect(res.send).to.not.have.been.called();
-      expect(req.conversion).to.exist;
-      expect(req.conversion.initNum).to.equal(32);
-      expect(req.conversion.initUnit).to.be.a('string');
-      done();
+      expect(convertHandler.getNum('32L')).to.equal(32);
+      expect(convertHandler.getNum('12gal')).to.equal(12);
+      expect(convertHandler.getNum('122lbs')).to.equal(122);
+      expect(convertHandler.getNum('112kg')).to.equal(112);
+      expect(convertHandler.getNum('88mi')).to.equal(88);
+      expect(convertHandler.getNum('34km')).to.equal(34);
+      return done();
     });
-    */
-    
+
     test('Decimal Input', function(done) {
-      expect(1).to.equal(1);
-      done();
+      expect(convertHandler.getNum('32.412L')).to.equal(32.412);
+      expect(convertHandler.getNum('12.312gal')).to.equal(12.312);
+      expect(convertHandler.getNum('122.45lbs')).to.equal(122.45);
+      expect(convertHandler.getNum('112.666kg')).to.equal(112.666);
+      expect(convertHandler.getNum('88.76mi')).to.equal(88.76);
+      expect(convertHandler.getNum('34.11km')).to.equal(34.11);
+      return done();
     });
     
     test('Fractional Input', function(done) {
-      expect(1).to.equal(1);
-      done();
+      expect(convertHandler.getNum('1/2L')).to.equal(1/2);
+      expect(convertHandler.getNum('3/4gal')).to.equal(3/4);
+      expect(convertHandler.getNum('5/2lbs')).to.equal(5/2);
+      expect(convertHandler.getNum('6/2kg')).to.equal(6/2);
+      expect(convertHandler.getNum('1/4mi')).to.equal(1/4);
+      expect(convertHandler.getNum('3/2km')).to.equal(3/2);
+      return done();
     });
     
     test('Fractional Input w/ Decimal', function(done) {
-      
-      done();
+      expect(convertHandler.getNum('1.2/2L')).to.equal(1.2/2);
+      expect(convertHandler.getNum('3.3/4gal')).to.equal(3.3/4);
+      expect(convertHandler.getNum('5.4/2lbs')).to.equal(5.4/2);
+      expect(convertHandler.getNum('6.5/2kg')).to.equal(6.5/2);
+      expect(convertHandler.getNum('1.6/4mi')).to.equal(1.6/4);
+      expect(convertHandler.getNum('3.7/2km')).to.equal(3.7/2);
+      return done();
     });
     
     test('Invalid Input (double fraction)', function(done) {
-      
-      done();
+      expect(convertHandler.getNum.bind(null, '3.3/4/3L')).to.throw('Too many divisions');
+      expect(convertHandler.getNum.bind(null, '3.3/4/3gal')).to.throw('Too many divisions');
+      expect(convertHandler.getNum.bind(null, '3.3/4/3lbs')).to.throw('Too many divisions');
+      expect(convertHandler.getNum.bind(null, '3.3/4/3kg')).to.throw('Too many divisions');
+      expect(convertHandler.getNum.bind(null, '3.3/4/3mi')).to.throw('Too many divisions');
+      expect(convertHandler.getNum.bind(null, '3.3/4/3km')).to.throw('Too many divisions');
+      return done();
     });
     
     test('No Numerical Input', function(done) {
-      
-      done();
+      expect(convertHandler.getNum('L')).to.equal(1);
+      expect(convertHandler.getNum('gal')).to.equal(1);
+      expect(convertHandler.getNum('lbs')).to.equal(1);
+      expect(convertHandler.getNum('kg')).to.equal(1);
+      expect(convertHandler.getNum('mi')).to.equal(1);
+      expect(convertHandler.getNum('km')).to.equal(1);
+      return done();
     }); 
-    
   });
   
   suite('Function convertHandler.getUnit(input)', function() {
     
     test('For Each Valid Unit Inputs', function(done) {
       var input = ['gal','l','mi','km','lbs','kg','GAL','L','MI','KM','LBS','KG'];
-      input.forEach(function(ele) {
-        //assert
+      input.forEach(function(u) {
+        expect(convertHandler.getUnit(u)).to.equal(u);
       });
       done();
     });
     
     test('Unknown Unit Input', function(done) {
-      
+      var input = ['agal','dl','mai','kam','ltbs','qkg','GeAL','WL','RAM','LABS','KGG'];
+      input.forEach(function(u) {
+        expect(convertHandler.getUnit.bind(null,u)).to.throw('Invalid unit');
+      });
       done();
     });  
     
@@ -83,10 +104,10 @@ suite('Unit Tests', function(){
   suite('Function convertHandler.getReturnUnit(initUnit)', function() {
     
     test('For Each Valid Unit Inputs', function(done) {
-      var input = ['gal','l','mi','km','lbs','kg'];
-      var expect = ['l','gal','km','mi','kg','lbs'];
+      var input = ['gal','L','mi','km','lbs','kg'];
+      var expected = ['L','gal','km','mi','kg','lbs'];
       input.forEach(function(ele, i) {
-        assert.equal(convertHandler.getReturnUnit(ele), expect[i]);
+        expect(convertHandler.getReturnUnit(ele)).to.equal(expected[i]);
       });
       done();
     });

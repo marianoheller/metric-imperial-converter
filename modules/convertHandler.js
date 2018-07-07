@@ -63,7 +63,7 @@ const getUnit = input => {
       return ret;
     })
   });
-  console.log("LOGGG", input, conversion);
+  console.log("LOGGG", input, conversion, inputUnitIndex);
   if(!conversion) throw Error("Invalid unit");
   return conversion.units[inputUnitIndex];
 };

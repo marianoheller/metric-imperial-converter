@@ -13,7 +13,8 @@ var convertHandler = require('../modules/convertHandler');
 
 module.exports = function (app) {
 
-    app.get('/api/convert', function( req, res) {
+    app.get('/convert', function( req, res) {
+      console.log("GOT HEREEE");
       if (!req.query.input) return res.sendStatus(400);
       const { input } = req.query;
       try {

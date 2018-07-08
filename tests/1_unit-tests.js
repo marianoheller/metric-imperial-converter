@@ -12,11 +12,26 @@ var expect = chai.expect;
 const spies = require('chai-spies-next');
 //const { mwParser, mwConverter, conversions } = require('../middleware/converter');
 const convertHandler = require('../modules/convertHandler');
+const conversions = require('../modules/conversions');
 
 chai.use(spies);
 
 
 suite('Unit Tests', function(){
+  
+  suite('Function convertHandler.getConversion(input)', function() {
+    test('Valid inputs', function(done) {
+      const inputs = [
+        '32gal', '12L',
+        '44lbs', '11kg',
+        '22mi', '44km',
+      ];
+      inputs.forEach((input, i) => {
+        expect(convertHandler.getConversion(input)).to.equal(conversions[i]);
+      });
+      return done();
+    });
+  });
   
   suite('Function convertHandler.getNum(input)', function() {
     
@@ -86,16 +101,16 @@ suite('Unit Tests', function(){
     test('For Each Valid Unit Inputs', function(done) {
       var input = ['gal','l','mi','km','lbs','kg','GAL','L','MI','KM','LBS','KG'];
       input.forEach(function(u) {
-        expect(convertHandler.getUnit(u)).to.equal(u);
+        expect(convertHandler.getUnit.bind(null,u)).to.not.throw();
       });
       done();
     });
     
     test('Unknown Unit Input', function(done) {
-      /* var input = ['agal','dl','mai','kam','ltbs','qkg','GeAL','WL','RAM','LABS','KGG'];
+      var input = ['agal','dl','mai','kam','ltbs','qkg','GeAL','WL','RAM','LABS','KGG'];
       input.forEach(function(u) {
         expect(convertHandler.getUnit.bind(null,u)).to.throw('Invalid unit');
-      }); */
+      });
       done();
     });  
     
@@ -117,7 +132,11 @@ suite('Unit Tests', function(){
   suite('Function convertHandler.spellOutUnit(unit)', function() {
     
     test('For Each Valid Unit Inputs', function(done) {
-      //see above example for hint
+      var input = ['gal','L','mi','km','lbs','kg'];
+      var expected = ['gallons','liters','miles', 'kilometers','pounds', 'kilograms'];
+      input.forEach(function(ele, i) {
+        expect(convertHandler.spellOutUnit(ele)).to.equal(expected[i]);
+      });
       done();
     });
     
@@ -133,27 +152,37 @@ suite('Unit Tests', function(){
     });
     
     test('L to Gal', function(done) {
-      
+      var input = [5, 'L'];
+      var expected = 1.32086;
+      assert.approximately(convertHandler.convert(input[0],input[1]),expected,0.1); //0.1 tolerance
       done();
     });
     
     test('Mi to Km', function(done) {
-      
+      var input = [5, 'mi'];
+      var expected = 8.04672;
+      assert.approximately(convertHandler.convert(input[0],input[1]),expected,0.1); //0.1 tolerance
       done();
     });
     
     test('Km to Mi', function(done) {
-      
+      var input = [5, 'km'];
+      var expected = 3.10686;
+      assert.approximately(convertHandler.convert(input[0],input[1]),expected,0.1); //0.1 tolerance
       done();
     });
     
     test('Lbs to Kg', function(done) {
-      
+      var input = [5, 'lbs'];
+      var expected = 2.26796;
+      assert.approximately(convertHandler.convert(input[0],input[1]),expected,0.1); //0.1 tolerance
       done();
     });
     
     test('Kg to Lbs', function(done) {
-      
+      var input = [5, 'kg'];
+      var expected = 11.0231;
+      assert.approximately(convertHandler.convert(input[0],input[1]),expected,0.1); //0.1 tolerance
       done();
     });
     
